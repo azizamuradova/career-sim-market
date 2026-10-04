@@ -15,7 +15,7 @@ async function seed() {
   const products = [];
   for (let i = 1; i <= 10; i++) {
     const product = await createProduct(
-      'Product' + i,
+      'Product ' + i,
       'Description of product' + i,
       i * 10,
     );
@@ -23,7 +23,7 @@ async function seed() {
   }
 
   const order = await createOrder('2026-10-01', 'First order', user.id);
-  for (let i = 0; i <= 5; i++) {
+  for (let i = 0; i < 5; i++) {
     await createOrderProduct(order.id, products[i].id, 1);
   }
 }
