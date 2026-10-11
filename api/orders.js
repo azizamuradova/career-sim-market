@@ -53,12 +53,12 @@ router.post(
   },
 );
 
-router.get('/:products', async (req, res) => {
+router.get('/:id/products', async (req, res) => {
   const order = await getOrderById(req.params.id);
   if (!order) return res.status(404).send('Order not found.');
   if (order.user_id !== req.user.id)
     return res.status(403).send('This is not your order.');
 
-  const products = await getOrdersByUserId(order.id);
+  const products = await getProductsByOrderId(order.id);
   res.send(products);
 });
