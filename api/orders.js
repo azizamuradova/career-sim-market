@@ -6,7 +6,7 @@ import {
   getOrdersByUserId,
   getOrderById,
 } from '#db/queries/orders';
-import { getProductById } from '#db/queries/products';
+import { getProductById, getProductsByOrderId } from '#db/queries/products';
 import { createOrderProduct } from '#db/queries/orders_products';
 
 const router = express.Router();
@@ -52,3 +52,13 @@ router.post(
     res.status(201).send(orderProduct);
   },
 );
+
+router.get('/:products', async (req, res) => {
+  const order = await getOrderById(req.params.id);
+  if (!order) return res.status(404).send('Order not found.');
+  if (order.user_id !== req.user.id)
+    return res.status(403).send('This is not your order.');
+
+  const products = await getOrdersByUserId(order.id);
+  res.send(products);
+});
