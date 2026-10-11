@@ -6,6 +6,8 @@ import {
   getOrdersByUserId,
   getOrderById,
 } from '#db/queries/orders';
+import { getProductById } from '#db/queries/products';
+import { createOrderProduct } from '#db/queries/orders_products';
 
 const router = express.Router();
 export default router;
@@ -30,3 +32,23 @@ router.get('/:id', async (req, res) => {
     return res.status(403).send('This is not your order.');
   res.send(order);
 });
+
+router.post(
+  '/:id/products',
+  requireBody(['productId', 'quantity']),
+  async (req, res) => {
+    const order = await getOrderById(req.params.id);
+    if (!order) return res.status(404).send('Order not found.');
+    if (order.user_id !== req.user.id)
+      return res.status(403).send('This is not your order.');
+    const { productId, quantity } = req.body;
+    const product = await getProductById(productId);
+    if (!product) return res.status(400).send('Product not found.');
+    const orderProduct = await createOrderProduct(
+      order.id,
+      product.id,
+      quantity,
+    );
+    res.status(201).send(orderProduct);
+  },
+);
